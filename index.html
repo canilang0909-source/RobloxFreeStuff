@@ -1,84 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Register & Login</title>
-    <style>
-        /* ===== GENERAL STYLING ===== */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
+<meta charset="UTF-8">
+<title>Register & Login</title>
 
-            /* Background image */
-            background-image: url('image.png'); /* put your image in 'public' folder */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
-        /* Dark overlay */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 0;
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 10px;
-            width: 350px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        h2 { text-align: center; margin-bottom: 20px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        input { padding: 10px; border-radius: 5px; border: none; outline: none; font-size: 16px; }
-        button { padding: 12px; border: none; border-radius: 5px; background-color: #ff6a00; color: #fff; font-size: 16px; cursor: pointer; transition: background 0.3s; }
-        button:hover { background-color: #ff9c4a; }
-        .form-section { margin-bottom: 30px; }
-        .form-section:last-child { margin-bottom: 0; }
-        a { color: #ff9c4a; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
+<style>
+/* ===== GENERAL STYLING ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    background: url('image.png') center/cover no-repeat;
+    position: relative;
+}
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    background: rgba(0,0,0,.7);
+    padding: 40px;
+    border-radius: 10px;
+    width: 350px;
+}
+
+/* ===== FORMS ===== */
+h2 { text-align: center; margin-bottom: 15px; }
+.form-section { margin-bottom: 25px; }
+form { display: flex; flex-direction: column; gap: 15px; }
+
+input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: #ff6a00;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+button:hover { background: #ff9c4a; }
+
+/* ===== SPIN MODAL ===== */
+#spinModal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.85);
+    z-index: 10;
+    flex-direction: column;
+}
+
+#spinHeader {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffdc00;
+}
+
+#wheelContainer {
+    position: relative;
+    width: 360px;
+    height: 360px;
+}
+
+#wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 8px solid #fff;
+    position: relative;
+    transition: transform 4s cubic-bezier(.17,.67,.2,1);
+    overflow: hidden;
+}
+
+/* slice styling */
+.slice {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 0%;
+}
+
+.slice-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.slice-inner img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+/* pointer */
+#pointer {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 24px solid red;
+}
+
+#spinBtn {
+    margin-top: 20px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    background: #ff6a00;
+    color: #fff;
+}
+#spinBtn:hover { background: #ff9c4a; }
+
+/* ===== CONFETTI ===== */
+.confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    pointer-events: none;
+    opacity: 0.9;
+    z-index: 20;
+}
+</style>
 </head>
-<body>
-    <div class="container">
-        <!-- REGISTER FORM FIRST -->
-        <div class="form-section">
-            <h2>Login</h2>
-            <form action="/register" method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
 
-        <!-- LOGIN FORM SECOND -->
-        <div class="form-section">
-            <h2>Confirm Login</h2>
-            <form action="/login" method="POST">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Done</button>
-            </form>
-        </div>
+<body>
+
+<div class="container">
+
+    <!-- REGISTER -->
+    <div class="form-section">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <input name="username" placeholder="Username" required>
+            <input name="password" type="password" placeholder="Password" required>
+            <button>Register</button>
+        </form>
     </div>
+
+   
+
+</div>
+
+<!-- SPIN MODAL -->
+<div id="spinModal">
+    <div id="spinHeader">SPIN TO WIN STUFFS</div>
+    <div id="wheelContainer">
+        <div id="pointer"></div>
+        <div id="wheel"></div>
+    </div>
+    <button id="spinBtn">SPIN</button>
+</div>
+
+<!-- SOUND -->
+<audio id="winSound" src="spin/win.mp3"></audio> <!-- put a win sound in public/spin/win.mp3 -->
+
+<script>
+/* ===== CUSTOMIZE YOUR SPIN IMAGES (MAX 6) ===== */
+const images = [
+    "image1.png",
+    "image2.png",
+    "image3.png",
+    "image4.png",
+    "image5.png",
+    "image6.png"
+];
+
+const colors = [
+    "#ff7675",
+    "#74b9ff",
+    "#ffeaa7",
+    "#55efc4",
+    "#fd79a8",
+    "#a29bfe"
+];
+
+const wheel = document.getElementById("wheel");
+const modal = document.getElementById("spinModal");
+const winSound = document.getElementById("winSound");
+let rotation = 0;
+
+/* BUILD WHEEL */
+function buildWheel() {
+    wheel.innerHTML = "";
+    const count = images.length;
+    const angle = 360 / count;
+
+    images.forEach((img, i) => {
+        const slice = document.createElement("div");
+        slice.className = "slice";
+        slice.style.transform = `rotate(${i * angle}deg)`;
+
+        const inner = document.createElement("div");
+        inner.className = "slice-inner";
+        inner.style.background = colors[i % colors.length];
+
+        inner.innerHTML = `<img src="${img}">`;
+        slice.appendChild(inner);
+        wheel.appendChild(slice);
+    });
+}
+
+buildWheel();
+
+/* REGISTER FORM + SHOW SPIN MODAL */
+document.getElementById("registerForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+
+    const res = await fetch("/register", {
+        method: "POST",
+        body: new URLSearchParams(data)
+    });
+
+    const text = await res.text();
+    if (text.includes("success")) {
+        modal.style.display = "flex";
+    } else {
+        alert(text);
+    }
+});
+
+/* SPIN BUTTON */
+document.getElementById("spinBtn").onclick = () => {
+    const count = images.length;
+    const angle = 360 / count;
+    const win = Math.floor(Math.random() * count);
+
+    rotation += 360 * 6 + win * angle; // spin 6 rounds + land
+    wheel.style.transform = `rotate(${rotation}deg)`;
+
+    setTimeout(() => {
+        // play sound
+        winSound.play();
+        // show confetti
+        launchConfetti();
+        alert("🎉 You won item #" + (win + 1));
+        modal.style.display = "none";
+    }, 4200);
+};
+
+/* ===== SIMPLE CONFETTI ===== */
+function launchConfetti() {
+    const count = 80;
+    for(let i=0;i<count;i++){
+        const confetti = document.createElement("div");
+        confetti.className = "confetti-piece";
+        confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+        confetti.style.left = (Math.random()*window.innerWidth) + "px";
+        confetti.style.top = "-10px";
+        document.body.appendChild(confetti);
+
+        let fall = setInterval(()=>{
+            let top = parseFloat(confetti.style.top);
+            confetti.style.top = top + 5 + "px";
+            confetti.style.transform = `rotate(${top*2}deg)`;
+            if(top>window.innerHeight){
+                confetti.remove();
+                clearInterval(fall);
+            }
+        }, 16);
+    }
+}
+</script>
+
 </body>
 </html>
-<title>Roblox Free Stuff Guide</title>
-
-<h1>Roblox Free Stuff</h1>
-
-<p>
-This is a fan-made website sharing information about Roblox free items and events.
-Not affiliated with Roblox Corporation.
-</p>
-
